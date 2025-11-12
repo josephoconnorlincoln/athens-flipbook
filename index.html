@@ -143,6 +143,7 @@
   <script>
     const totalPages = 132;
     let hideControlsTimeout;
+    const IS_MOBILE_DEVICE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     function getPageFilename(pageNum) {
       return pageNum === 1 ? 'page__.jpg' : `page__${pageNum}.jpg`;
@@ -163,7 +164,7 @@
       let loadedCount = 0;
 
       const ratio = 22 / 17;
-      const isMobile = window.innerWidth <= 768;
+      const isMobile = IS_MOBILE_DEVICE || window.innerWidth <= 768;
       const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
       
       // Adjust padding based on device
@@ -179,6 +180,8 @@
       const screenHeight = window.innerHeight - 10;
       const isPortrait = window.innerHeight > window.innerWidth;
       let flipbookWidth, flipbookHeight;
+      
+      console.log('Init - Width:', window.innerWidth, 'Height:', window.innerHeight, 'Portrait?', isPortrait, 'Mobile?', isMobile);
 
       if (isPortrait && isMobile) {
         // Portrait: single page
@@ -189,6 +192,7 @@
           flipbookHeight = screenHeight;
           flipbookWidth = screenHeight * ratio;
         }
+        console.log('Single page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
       } else {
         // Landscape or desktop: double page spread
         flipbookWidth = screenWidth;
@@ -198,6 +202,7 @@
           flipbookHeight = screenHeight;
           flipbookWidth = screenHeight * (ratio * 2);
         }
+        console.log('Double page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
       }
 
       function updateProgress() {
@@ -290,7 +295,7 @@
           
           // Recalculate with new orientation
           const ratio = 22 / 17;
-          const isMobile = window.innerWidth <= 768;
+          const isMobile = IS_MOBILE_DEVICE || window.innerWidth <= 768;
           const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
           
           let sidePadding = 80;
@@ -304,6 +309,8 @@
           const screenHeight = window.innerHeight - 10;
           const isPortrait = window.innerHeight > window.innerWidth;
           let flipbookWidth, flipbookHeight;
+          
+          console.log('Resize - Width:', window.innerWidth, 'Height:', window.innerHeight, 'Portrait?', isPortrait, 'Mobile?', isMobile);
 
           if (isPortrait && isMobile) {
             // Portrait: single page
@@ -314,6 +321,7 @@
               flipbookHeight = screenHeight;
               flipbookWidth = screenHeight * ratio;
             }
+            console.log('Switching to single page - Width:', flipbookWidth, 'Height:', flipbookHeight);
           } else {
             // Landscape or desktop: double page spread
             flipbookWidth = screenWidth;
@@ -323,6 +331,7 @@
               flipbookHeight = screenHeight;
               flipbookWidth = screenHeight * (ratio * 2);
             }
+            console.log('Switching to double page - Width:', flipbookWidth, 'Height:', flipbookHeight);
           }
           
           // Re-add all pages (from cache)
