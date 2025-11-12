@@ -178,32 +178,20 @@
       
       const screenWidth = window.innerWidth - sidePadding;
       const screenHeight = window.innerHeight - 10;
-      const isPortrait = window.innerHeight > window.innerWidth;
       let flipbookWidth, flipbookHeight;
       
-      console.log('Init - Width:', window.innerWidth, 'Height:', window.innerHeight, 'Portrait?', isPortrait, 'Mobile?', isMobile);
+      console.log('Init - Width:', window.innerWidth, 'Height:', window.innerHeight, 'Mobile?', isMobile);
 
-      if (isPortrait && isMobile) {
-        // Portrait: single page
-        flipbookWidth = screenWidth;
-        flipbookHeight = screenWidth / ratio;
-        
-        if (flipbookHeight > screenHeight) {
-          flipbookHeight = screenHeight;
-          flipbookWidth = screenHeight * ratio;
-        }
-        console.log('Single page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
-      } else {
-        // Landscape or desktop: double page spread
-        flipbookWidth = screenWidth;
-        flipbookHeight = screenWidth / (ratio * 2);
-        
-        if (flipbookHeight > screenHeight) {
-          flipbookHeight = screenHeight;
-          flipbookWidth = screenHeight * (ratio * 2);
-        }
-        console.log('Double page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
+      // Always double page spread
+      flipbookWidth = screenWidth;
+      flipbookHeight = screenWidth / (ratio * 2);
+      
+      if (flipbookHeight > screenHeight) {
+        flipbookHeight = screenHeight;
+        flipbookWidth = screenHeight * (ratio * 2);
       }
+      
+      console.log('Double page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
 
       function updateProgress() {
         loadedCount++;
@@ -235,8 +223,7 @@
         acceleration: true,
         gradients: true,
         elevation: 50,
-        duration: 1200,
-        display: (isPortrait && isMobile) ? 'single' : 'double'
+        duration: 1200
       });
     }
 
@@ -316,29 +303,18 @@
             const screenHeight = screenH - 10;
             let flipbookWidth, flipbookHeight;
             
-            console.log('Resize - Width:', screenW, 'Height:', screenH, 'Portrait?', isPortrait, 'Mobile?', isMobile);
+            console.log('Resize - Width:', screenW, 'Height:', screenH, 'Mobile?', isMobile);
 
-            if (isPortrait && isMobile) {
-              // Portrait: single page
-              flipbookWidth = screenWidth;
-              flipbookHeight = screenWidth / ratio;
-              
-              if (flipbookHeight > screenHeight) {
-                flipbookHeight = screenHeight;
-                flipbookWidth = screenHeight * ratio;
-              }
-              console.log('Switching to single page - Width:', flipbookWidth, 'Height:', flipbookHeight);
-            } else {
-              // Landscape or desktop: double page spread
-              flipbookWidth = screenWidth;
-              flipbookHeight = screenWidth / (ratio * 2);
-              
-              if (flipbookHeight > screenHeight) {
-                flipbookHeight = screenHeight;
-                flipbookWidth = screenHeight * (ratio * 2);
-              }
-              console.log('Switching to double page - Width:', flipbookWidth, 'Height:', flipbookHeight);
+            // Always double page spread
+            flipbookWidth = screenWidth;
+            flipbookHeight = screenWidth / (ratio * 2);
+            
+            if (flipbookHeight > screenHeight) {
+              flipbookHeight = screenHeight;
+              flipbookWidth = screenHeight * (ratio * 2);
             }
+            
+            console.log('Double page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
             
             // Re-add all pages (from cache)
             for (let i = 1; i <= totalPages; i++) {
@@ -355,7 +331,6 @@
               gradients: true,
               elevation: 50,
               duration: 1200,
-              display: (isPortrait && isMobile) ? 'single' : 'double',
               page: currentPage
             });
           }, 100); // Brief delay after orientation change
