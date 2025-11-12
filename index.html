@@ -165,46 +165,36 @@
       const ratio = 22 / 17;
       const isMobile = window.innerWidth <= 768;
       const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
-      const isLandscape = window.innerWidth > window.innerHeight;
       
-      // Adjust padding based on device and orientation
+      // Adjust padding based on device
       let sidePadding = 80; // desktop default (40px each side)
-      let topBottomPadding = 10;
       
       if (isMobile) {
-        if (isLandscape) {
-          sidePadding = 10; // Very minimal in landscape
-          topBottomPadding = 5;
-        } else {
-          sidePadding = 10; // Portrait
-          topBottomPadding = 10;
-        }
+        sidePadding = 10; // mobile minimal padding
       } else if (isTablet) {
-        sidePadding = 40;
-        topBottomPadding = 10;
+        sidePadding = 40; // tablet
       }
       
       const screenWidth = window.innerWidth - sidePadding;
-      const screenHeight = window.innerHeight - topBottomPadding;
+      const screenHeight = window.innerHeight - 10;
       let flipbookWidth, flipbookHeight;
 
-      // Calculate for double page spread
-      if (isMobile && isLandscape) {
-        // Mobile landscape: force it to fill width more aggressively
-        flipbookWidth = screenWidth;
-        flipbookHeight = flipbookWidth / (ratio * 2);
+      // Simple: always calculate both ways and pick the one that fits
+      const option1Width = screenWidth;
+      const option1Height = screenWidth / (ratio * 2);
+      
+      const option2Height = screenHeight;
+      const option2Width = screenHeight * (ratio * 2);
+      
+      // Pick whichever option actually fits in the screen
+      if (option1Height <= screenHeight && option1Width <= screenWidth) {
+        // Option 1 fits: use full width
+        flipbookWidth = option1Width;
+        flipbookHeight = option1Height;
       } else {
-        // Everything else: use whichever dimension is limiting
-        const widthBasedHeight = screenWidth / (ratio * 2);
-        const heightBasedWidth = screenHeight * (ratio * 2);
-        
-        if (widthBasedHeight <= screenHeight) {
-          flipbookWidth = screenWidth;
-          flipbookHeight = widthBasedHeight;
-        } else {
-          flipbookHeight = screenHeight;
-          flipbookWidth = heightBasedWidth;
-        }
+        // Option 2: use full height
+        flipbookWidth = option2Width;
+        flipbookHeight = option2Height;
       }
 
       function updateProgress() {
