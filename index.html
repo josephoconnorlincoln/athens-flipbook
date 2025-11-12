@@ -101,6 +101,23 @@
     .fullscreen-btn:hover {background: rgba(255,255,255,0.2);transform: scale(1.05);}
     .fullscreen-btn.visible {opacity: 1;}
     .fullscreen-btn .icon {font-size:18px;}
+
+    /* Responsive adjustments for phones and small tablets */
+    @media (max-width: 768px) {
+      .container {padding: 0 10px;}
+      #flipbook {
+        width: 100% !important;
+        height: auto !important;
+      }
+      #flipbook .page img {object-fit: contain;}
+      .fullscreen-btn {
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .loading-bar {width: 200px;}
+    }
   </style>
 </head>
 <body>
@@ -142,15 +159,19 @@
       let loadedCount = 0;
 
       const ratio = 22 / 17;
-      const screenWidth = window.innerWidth - 80;
+      const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
       let flipbookWidth, flipbookHeight;
 
-      if (screenWidth / screenHeight > ratio * 2) {
+      // Responsive size calculation
+      if (screenWidth < 900) {
+        flipbookWidth = screenWidth - 20;
+        flipbookHeight = flipbookWidth / ratio;
+      } else if (screenWidth / screenHeight > ratio * 2) {
         flipbookHeight = screenHeight;
         flipbookWidth = flipbookHeight * ratio * 2;
       } else {
-        flipbookWidth = screenWidth;
+        flipbookWidth = screenWidth - 80;
         flipbookHeight = flipbookWidth / (ratio * 2);
       }
 
