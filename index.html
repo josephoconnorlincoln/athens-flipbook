@@ -287,72 +287,79 @@
           
           const currentPage = flipbook.turn('page');
           
-          // Destroy Turn.js instance
-          flipbook.turn('destroy');
+          console.log('Orientation changed to:', currentOrientation);
           
-          // Clear all existing page elements
-          flipbook.empty();
-          
-          // Recalculate with new orientation
-          const ratio = 22 / 17;
-          const isMobile = IS_MOBILE_DEVICE || window.innerWidth <= 768;
-          const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
-          
-          let sidePadding = 80;
-          if (isMobile) {
-            sidePadding = 10;
-          } else if (isTablet) {
-            sidePadding = 40;
-          }
-          
-          const screenWidth = window.innerWidth - sidePadding;
-          const screenHeight = window.innerHeight - 10;
-          const isPortrait = window.innerHeight > window.innerWidth;
-          let flipbookWidth, flipbookHeight;
-          
-          console.log('Resize - Width:', window.innerWidth, 'Height:', window.innerHeight, 'Portrait?', isPortrait, 'Mobile?', isMobile);
+          // Force a brief delay to let browser finish rotating
+          setTimeout(function() {
+            // Destroy Turn.js instance
+            flipbook.turn('destroy');
+            
+            // Clear all existing page elements
+            flipbook.empty();
+            
+            // Recalculate with new orientation - force fresh read
+            const ratio = 22 / 17;
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            const isMobile = IS_MOBILE_DEVICE || screenW <= 768;
+            const isTablet = screenW <= 1024 && screenW > 768;
+            const isPortrait = screenH > screenW;
+            
+            let sidePadding = 80;
+            if (isMobile) {
+              sidePadding = 10;
+            } else if (isTablet) {
+              sidePadding = 40;
+            }
+            
+            const screenWidth = screenW - sidePadding;
+            const screenHeight = screenH - 10;
+            let flipbookWidth, flipbookHeight;
+            
+            console.log('Resize - Width:', screenW, 'Height:', screenH, 'Portrait?', isPortrait, 'Mobile?', isMobile);
 
-          if (isPortrait && isMobile) {
-            // Portrait: single page
-            flipbookWidth = screenWidth;
-            flipbookHeight = screenWidth / ratio;
-            
-            if (flipbookHeight > screenHeight) {
-              flipbookHeight = screenHeight;
-              flipbookWidth = screenHeight * ratio;
+            if (isPortrait && isMobile) {
+              // Portrait: single page
+              flipbookWidth = screenWidth;
+              flipbookHeight = screenWidth / ratio;
+              
+              if (flipbookHeight > screenHeight) {
+                flipbookHeight = screenHeight;
+                flipbookWidth = screenHeight * ratio;
+              }
+              console.log('Switching to single page - Width:', flipbookWidth, 'Height:', flipbookHeight);
+            } else {
+              // Landscape or desktop: double page spread
+              flipbookWidth = screenWidth;
+              flipbookHeight = screenWidth / (ratio * 2);
+              
+              if (flipbookHeight > screenHeight) {
+                flipbookHeight = screenHeight;
+                flipbookWidth = screenHeight * (ratio * 2);
+              }
+              console.log('Switching to double page - Width:', flipbookWidth, 'Height:', flipbookHeight);
             }
-            console.log('Switching to single page - Width:', flipbookWidth, 'Height:', flipbookHeight);
-          } else {
-            // Landscape or desktop: double page spread
-            flipbookWidth = screenWidth;
-            flipbookHeight = screenWidth / (ratio * 2);
             
-            if (flipbookHeight > screenHeight) {
-              flipbookHeight = screenHeight;
-              flipbookWidth = screenHeight * (ratio * 2);
+            // Re-add all pages (from cache)
+            for (let i = 1; i <= totalPages; i++) {
+              const filename = getPageFilename(i);
+              flipbook.append(`<div class="page"><img src="${filename}" alt="Page ${i}"></div>`);
             }
-            console.log('Switching to double page - Width:', flipbookWidth, 'Height:', flipbookHeight);
-          }
-          
-          // Re-add all pages (from cache)
-          for (let i = 1; i <= totalPages; i++) {
-            const filename = getPageFilename(i);
-            flipbook.append(`<div class="page"><img src="${filename}" alt="Page ${i}"></div>`);
-          }
-          
-          // Reinitialize with new dimensions
-          flipbook.turn({
-            width: flipbookWidth,
-            height: flipbookHeight,
-            autoCenter: true,
-            acceleration: true,
-            gradients: true,
-            elevation: 50,
-            duration: 1200,
-            display: (isPortrait && isMobile) ? 'single' : 'double',
-            page: currentPage
-          });
-        }, 500);
+            
+            // Reinitialize with new dimensions
+            flipbook.turn({
+              width: flipbookWidth,
+              height: flipbookHeight,
+              autoCenter: true,
+              acceleration: true,
+              gradients: true,
+              elevation: 50,
+              duration: 1200,
+              display: (isPortrait && isMobile) ? 'single' : 'double',
+              page: currentPage
+            });
+          }, 100); // Brief delay after orientation change
+        }, 300);
       }
     });
   </script>
