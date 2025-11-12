@@ -1,22 +1,4 @@
-    .container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0 40px;
-      opacity: 0;
-      animation: fadeIn 0.8s ease-in forwards;
-    }
-    @media (max-width: 1024px) {
-      .container {
-        padding: 0 10px;
-      }
-    }
-    @media (max-width: 768px) {
-      .container {
-        padding: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -55,6 +37,16 @@
       padding: 0 40px;
       opacity: 0;
       animation: fadeIn 0.8s ease-in forwards;
+    }
+    @media (max-width: 1024px) {
+      .container {
+        padding: 0 10px;
+      }
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 5px;
+      }
     }
     @keyframes fadeIn {
       to { opacity: 1; }
@@ -183,19 +175,14 @@
     const totalPages = 132;
     let hideControlsTimeout;
     
-    // Generate page filename based on page number
     function getPageFilename(pageNum) {
-      if (pageNum === 1) {
-        return 'page__.jpg';
-      }
+      if (pageNum === 1) return 'page__.jpg';
       return `page__${pageNum}.jpg`;
     }
 
-    // Mouse movement handler
     function handleMouseMove() {
       $('body').addClass('show-cursor');
       $('.fullscreen-btn').addClass('visible');
-      
       clearTimeout(hideControlsTimeout);
       hideControlsTimeout = setTimeout(() => {
         $('body').removeClass('show-cursor');
@@ -203,18 +190,15 @@
       }, 3000);
     }
 
-    // Initialize flipbook
     function initFlipbook() {
       const flipbook = $('#flipbook');
       let loadedCount = 0;
       
-      // Calculate dimensions to fit screen while maintaining 22:17 ratio
       const ratio = 22 / 17;
       const screenWidth = window.innerWidth - 80;
       const screenHeight = window.innerHeight;
       
       let flipbookWidth, flipbookHeight;
-      
       if (screenWidth / screenHeight > ratio * 2) {
         flipbookHeight = screenHeight;
         flipbookWidth = flipbookHeight * ratio * 2;
@@ -223,14 +207,11 @@
         flipbookHeight = flipbookWidth / (ratio * 2);
       }
       
-      // Update progress
       function updateProgress() {
         loadedCount++;
         const percent = Math.round((loadedCount / totalPages) * 100);
         $('#loadingProgress').text(`${loadedCount} / ${totalPages}`);
         $('#loadingBar').css('width', percent + '%');
-        
-        // When all loaded, show flipbook
         if (loadedCount === totalPages) {
           setTimeout(() => {
             $('#loading').hide();
@@ -239,15 +220,12 @@
         }
       }
       
-      // Add all pages normally - load everything upfront
       for (let i = 1; i <= totalPages; i++) {
         const filename = getPageFilename(i);
         const img = new Image();
-        
         img.onload = updateProgress;
-        img.onerror = updateProgress; // Count errors too so we don't get stuck
+        img.onerror = updateProgress;
         img.src = filename;
-        
         flipbook.append(`
           <div class="page">
             <img src="${filename}" alt="Page ${i}">
@@ -255,7 +233,6 @@
         `);
       }
 
-      // Initialize Turn.js with slower page turns
       flipbook.turn({
         width: flipbookWidth,
         height: flipbookHeight,
@@ -267,73 +244,33 @@
       });
     }
 
-    function nextPage() {
-      $('#flipbook').turn('next');
-    }
+    function nextPage() { $('#flipbook').turn('next'); }
+    function prevPage() { $('#flipbook').turn('previous'); }
 
-    function prevPage() {
-      $('#flipbook').turn('previous');
-    }
-
-    // Fullscreen toggle
     function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
     }
 
-    // Fullscreen button
     $('#fullscreenBtn').click(toggleFullscreen);
 
-    // Keyboard controls
     $(document).keydown(function(e) {
-      if (e.keyCode === 37) { // Left arrow
-        e.preventDefault();
-        prevPage();
-      }
-      if (e.keyCode === 39) { // Right arrow
-        e.preventDefault();
-        nextPage();
-      }
-      if (e.keyCode === 36) { // Home
-        e.preventDefault();
-        $('#flipbook').turn('page', 1);
-      }
-      if (e.keyCode === 35) { // End
-        e.preventDefault();
-        $('#flipbook').turn('page', totalPages);
-      }
-      if (e.keyCode === 122) { // F11
-        e.preventDefault();
-        toggleFullscreen();
-      }
+      if (e.keyCode === 37) { e.preventDefault(); prevPage(); }
+      if (e.keyCode === 39) { e.preventDefault(); nextPage(); }
+      if (e.keyCode === 36) { e.preventDefault(); $('#flipbook').turn('page', 1); }
+      if (e.keyCode === 35) { e.preventDefault(); $('#flipbook').turn('page', totalPages); }
+      if (e.keyCode === 122) { e.preventDefault(); toggleFullscreen(); }
     });
 
-    // Mouse movement tracking
     $(document).mousemove(handleMouseMove);
-    
-    // Touch support for swipe
+
     let touchStartX = 0;
-    $(document).on('touchstart', function(e) {
-      touchStartX = e.touches[0].clientX;
-    });
-    
-    $(document).on('touchend', function(e) {
-      const touchEndX = e.changedTouches[0].clientX;
-      const diff = touchStartX - touchEndX;
-      
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) {
-          nextPage();
-        } else {
-          prevPage();
-        }
-      }
+    $(document).on('touchstart', e => touchStartX = e.touches[0].clientX);
+    $(document).on('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) diff > 0 ? nextPage() : prevPage();
     });
 
-    // Initialize when page loads
     $(document).ready(function() {
       initFlipbook();
       handleMouseMove();
