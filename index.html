@@ -30,6 +30,19 @@
       opacity: 0;
       animation: fadeIn 0.8s ease-in forwards;
     }
+    @media (max-width: 1024px) {
+      .container {
+        padding: 0 20px;
+      }
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 5px;
+      }
+      body {
+        cursor: default;
+      }
+    }
     @keyframes fadeIn {to {opacity: 1;}}
     #flipbook {
       margin: 0 auto;
@@ -101,6 +114,14 @@
     .fullscreen-btn:hover {background: rgba(255,255,255,0.2);transform: scale(1.05);}
     .fullscreen-btn.visible {opacity: 1;}
     .fullscreen-btn .icon {font-size:18px;}
+    @media (max-width: 768px) {
+      .fullscreen-btn {
+        padding: 10px 16px;
+        font-size: 12px;
+        top: 10px;
+        right: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -142,7 +163,18 @@
       let loadedCount = 0;
 
       const ratio = 22 / 17;
-      const screenWidth = window.innerWidth - 80;
+      const isMobile = window.innerWidth <= 768;
+      const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
+      
+      // Adjust padding based on device
+      let sidePadding = 80; // desktop default (40px each side)
+      if (isMobile) {
+        sidePadding = 10; // mobile (5px each side)
+      } else if (isTablet) {
+        sidePadding = 40; // tablet (20px each side)
+      }
+      
+      const screenWidth = window.innerWidth - sidePadding;
       const screenHeight = window.innerHeight;
       let flipbookWidth, flipbookHeight;
 
