@@ -177,17 +177,27 @@
       
       const screenWidth = window.innerWidth - sidePadding;
       const screenHeight = window.innerHeight - 10;
+      const isPortrait = window.innerHeight > window.innerWidth;
       let flipbookWidth, flipbookHeight;
 
-      // For double page spread (ratio * 2)
-      // Try filling width first
-      flipbookWidth = screenWidth;
-      flipbookHeight = screenWidth / (ratio * 2);
-      
-      // If height doesn't fit, scale down to fit height instead
-      if (flipbookHeight > screenHeight) {
-        flipbookHeight = screenHeight;
-        flipbookWidth = screenHeight * (ratio * 2);
+      if (isPortrait && isMobile) {
+        // Portrait: single page
+        flipbookWidth = screenWidth;
+        flipbookHeight = screenWidth / ratio;
+        
+        if (flipbookHeight > screenHeight) {
+          flipbookHeight = screenHeight;
+          flipbookWidth = screenHeight * ratio;
+        }
+      } else {
+        // Landscape or desktop: double page spread
+        flipbookWidth = screenWidth;
+        flipbookHeight = screenWidth / (ratio * 2);
+        
+        if (flipbookHeight > screenHeight) {
+          flipbookHeight = screenHeight;
+          flipbookWidth = screenHeight * (ratio * 2);
+        }
       }
 
       function updateProgress() {
@@ -220,7 +230,8 @@
         acceleration: true,
         gradients: true,
         elevation: 50,
-        duration: 1200
+        duration: 1200,
+        display: (isPortrait && isMobile) ? 'single' : 'double'
       });
     }
 
@@ -291,14 +302,27 @@
           
           const screenWidth = window.innerWidth - sidePadding;
           const screenHeight = window.innerHeight - 10;
+          const isPortrait = window.innerHeight > window.innerWidth;
           let flipbookWidth, flipbookHeight;
 
-          flipbookWidth = screenWidth;
-          flipbookHeight = screenWidth / (ratio * 2);
-          
-          if (flipbookHeight > screenHeight) {
-            flipbookHeight = screenHeight;
-            flipbookWidth = screenHeight * (ratio * 2);
+          if (isPortrait && isMobile) {
+            // Portrait: single page
+            flipbookWidth = screenWidth;
+            flipbookHeight = screenWidth / ratio;
+            
+            if (flipbookHeight > screenHeight) {
+              flipbookHeight = screenHeight;
+              flipbookWidth = screenHeight * ratio;
+            }
+          } else {
+            // Landscape or desktop: double page spread
+            flipbookWidth = screenWidth;
+            flipbookHeight = screenWidth / (ratio * 2);
+            
+            if (flipbookHeight > screenHeight) {
+              flipbookHeight = screenHeight;
+              flipbookWidth = screenHeight * (ratio * 2);
+            }
           }
           
           // Re-add all pages (from cache)
@@ -316,6 +340,7 @@
             gradients: true,
             elevation: 50,
             duration: 1200,
+            display: (isPortrait && isMobile) ? 'single' : 'double',
             page: currentPage
           });
         }, 500);
