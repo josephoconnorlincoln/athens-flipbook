@@ -271,8 +271,11 @@
           
           const currentPage = flipbook.turn('page');
           
-          // Destroy and rebuild (images load from cache instantly)
+          // Destroy Turn.js instance
           flipbook.turn('destroy');
+          
+          // Clear all existing page elements
+          flipbook.empty();
           
           // Recalculate with new orientation
           const ratio = 22 / 17;
@@ -296,6 +299,12 @@
           if (flipbookHeight > screenHeight) {
             flipbookHeight = screenHeight;
             flipbookWidth = screenHeight * (ratio * 2);
+          }
+          
+          // Re-add all pages (from cache)
+          for (let i = 1; i <= totalPages; i++) {
+            const filename = getPageFilename(i);
+            flipbook.append(`<div class="page"><img src="${filename}" alt="Page ${i}"></div>`);
           }
           
           // Reinitialize with new dimensions
