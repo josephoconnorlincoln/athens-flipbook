@@ -269,6 +269,22 @@
     });
 
     $(document).ready(() => {initFlipbook();handleMouseMove();});
+    
+    // Reinitialize on orientation change / resize
+    let resizeTimeout;
+    $(window).on('resize orientationchange', function() {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function() {
+        const currentPage = $('#flipbook').turn('page');
+        $('#flipbook').turn('destroy');
+        $('#flipbook').empty();
+        initFlipbook();
+        // Restore to the same page after reinit
+        setTimeout(() => {
+          $('#flipbook').turn('page', currentPage);
+        }, 100);
+      }, 300);
+    });
   </script>
 </body>
 </html>
