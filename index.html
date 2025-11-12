@@ -179,22 +179,15 @@
       const screenHeight = window.innerHeight - 10;
       let flipbookWidth, flipbookHeight;
 
-      // Simple: always calculate both ways and pick the one that fits
-      const option1Width = screenWidth;
-      const option1Height = screenWidth / (ratio * 2);
+      // For double page spread (ratio * 2)
+      // Try filling width first
+      flipbookWidth = screenWidth;
+      flipbookHeight = screenWidth / (ratio * 2);
       
-      const option2Height = screenHeight;
-      const option2Width = screenHeight * (ratio * 2);
-      
-      // Pick whichever option actually fits in the screen
-      if (option1Height <= screenHeight && option1Width <= screenWidth) {
-        // Option 1 fits: use full width
-        flipbookWidth = option1Width;
-        flipbookHeight = option1Height;
-      } else {
-        // Option 2: use full height
-        flipbookWidth = option2Width;
-        flipbookHeight = option2Height;
+      // If height doesn't fit, scale down to fit height instead
+      if (flipbookHeight > screenHeight) {
+        flipbookHeight = screenHeight;
+        flipbookWidth = screenHeight * (ratio * 2);
       }
 
       function updateProgress() {
@@ -285,20 +278,17 @@
         const screenWidth = window.innerWidth - sidePadding;
         const screenHeight = window.innerHeight - 10;
         
-        const option1Width = screenWidth;
-        const option1Height = screenWidth / (ratio * 2);
-        
-        const option2Height = screenHeight;
-        const option2Width = screenHeight * (ratio * 2);
-        
         let flipbookWidth, flipbookHeight;
         
-        if (option1Height <= screenHeight && option1Width <= screenWidth) {
-          flipbookWidth = option1Width;
-          flipbookHeight = option1Height;
-        } else {
-          flipbookWidth = option2Width;
-          flipbookHeight = option2Height;
+        // For double page spread (ratio * 2)
+        // Try filling width first
+        flipbookWidth = screenWidth;
+        flipbookHeight = screenWidth / (ratio * 2);
+        
+        // If height doesn't fit, scale down to fit height instead
+        if (flipbookHeight > screenHeight) {
+          flipbookHeight = screenHeight;
+          flipbookWidth = screenHeight * (ratio * 2);
         }
         
         // Resize the existing flipbook without destroying it
