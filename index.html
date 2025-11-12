@@ -165,17 +165,27 @@
       const ratio = 22 / 17;
       const isMobile = window.innerWidth <= 768;
       const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
+      const isLandscape = window.innerWidth > window.innerHeight;
       
-      // Adjust padding based on device
+      // Adjust padding based on device and orientation
       let sidePadding = 80; // desktop default (40px each side)
+      let topBottomPadding = 10;
+      
       if (isMobile) {
-        sidePadding = 10; // mobile (5px each side)
+        if (isLandscape) {
+          sidePadding = 10; // Very minimal in landscape
+          topBottomPadding = 5;
+        } else {
+          sidePadding = 10; // Portrait
+          topBottomPadding = 10;
+        }
       } else if (isTablet) {
-        sidePadding = 40; // tablet (20px each side)
+        sidePadding = 40;
+        topBottomPadding = 10;
       }
       
       const screenWidth = window.innerWidth - sidePadding;
-      const screenHeight = window.innerHeight - 10; // Small margin top/bottom
+      const screenHeight = window.innerHeight - topBottomPadding;
       let flipbookWidth, flipbookHeight;
 
       // Calculate for double page spread - use whichever dimension is limiting
