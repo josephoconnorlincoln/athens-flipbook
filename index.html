@@ -188,18 +188,23 @@
       const screenHeight = window.innerHeight - topBottomPadding;
       let flipbookWidth, flipbookHeight;
 
-      // Calculate for double page spread - use whichever dimension is limiting
-      const widthBasedHeight = screenWidth / (ratio * 2);
-      const heightBasedWidth = screenHeight * (ratio * 2);
-      
-      if (widthBasedHeight <= screenHeight) {
-        // Width is the limiting factor
+      // Calculate for double page spread
+      if (isMobile && isLandscape) {
+        // Mobile landscape: force it to fill width more aggressively
         flipbookWidth = screenWidth;
-        flipbookHeight = widthBasedHeight;
+        flipbookHeight = flipbookWidth / (ratio * 2);
       } else {
-        // Height is the limiting factor
-        flipbookHeight = screenHeight;
-        flipbookWidth = heightBasedWidth;
+        // Everything else: use whichever dimension is limiting
+        const widthBasedHeight = screenWidth / (ratio * 2);
+        const heightBasedWidth = screenHeight * (ratio * 2);
+        
+        if (widthBasedHeight <= screenHeight) {
+          flipbookWidth = screenWidth;
+          flipbookHeight = widthBasedHeight;
+        } else {
+          flipbookHeight = screenHeight;
+          flipbookWidth = heightBasedWidth;
+        }
       }
 
       function updateProgress() {
