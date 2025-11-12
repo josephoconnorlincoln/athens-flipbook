@@ -253,48 +253,64 @@
 
     $(document).ready(() => {initFlipbook();handleMouseMove();});
     
-    // Resize flipbook on orientation change without reloading images
+    // Reinitialize on orientation change
     let resizeTimeout;
+    let lastOrientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+    
     $(window).on('resize orientationchange', function() {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(function() {
-        const flipbook = $('#flipbook');
-        if (!flipbook.turn('is')) return; // Not initialized yet
+      const currentOrientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+      
+      // Only rebuild if orientation actually changed
+      if (currentOrientation !== lastOrientation) {
+        lastOrientation = currentOrientation;
         
-        const currentPage = flipbook.turn('page');
-        
-        // Recalculate dimensions
-        const ratio = 22 / 17;
-        const isMobile = window.innerWidth <= 768;
-        const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
-        
-        let sidePadding = 80;
-        if (isMobile) {
-          sidePadding = 10;
-        } else if (isTablet) {
-          sidePadding = 40;
-        }
-        
-        const screenWidth = window.innerWidth - sidePadding;
-        const screenHeight = window.innerHeight - 10;
-        
-        let flipbookWidth, flipbookHeight;
-        
-        // For double page spread (ratio * 2)
-        // Try filling width first
-        flipbookWidth = screenWidth;
-        flipbookHeight = screenWidth / (ratio * 2);
-        
-        // If height doesn't fit, scale down to fit height instead
-        if (flipbookHeight > screenHeight) {
-          flipbookHeight = screenHeight;
-          flipbookWidth = screenHeight * (ratio * 2);
-        }
-        
-        // Resize the existing flipbook without destroying it
-        flipbook.turn('size', flipbookWidth, flipbookHeight);
-        flipbook.turn('page', currentPage);
-      }, 300);
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+          const flipbook = $('#flipbook');
+          if (!flipbook.turn('is')) return;
+          
+          const currentPage = flipbook.turn('page');
+          
+          // Destroy and rebuild (images load from cache instantly)
+          flipbook.turn('destroy');
+          
+          // Recalculate with new orientation
+          const ratio = 22 / 17;
+          const isMobile = window.innerWidth <= 768;
+          const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
+          
+          let sidePadding = 80;
+          if (isMobile) {
+            sidePadding = 10;
+          } else if (isTablet) {
+            sidePadding = 40;
+          }
+          
+          const screenWidth = window.innerWidth - sidePadding;
+          const screenHeight = window.innerHeight - 10;
+          let flipbookWidth, flipbookHeight;
+
+          flipbookWidth = screenWidth;
+          flipbookHeight = screenWidth / (ratio * 2);
+          
+          if (flipbookHeight > screenHeight) {
+            flipbookHeight = screenHeight;
+            flipbookWidth = screenHeight * (ratio * 2);
+          }
+          
+          // Reinitialize with new dimensions
+          flipbook.turn({
+            width: flipbookWidth,
+            height: flipbookHeight,
+            autoCenter: true,
+            acceleration: true,
+            gradients: true,
+            elevation: 50,
+            duration: 1200,
+            page: currentPage
+          });
+        }, 500);
+      }
     });
   </script>
 </body>
