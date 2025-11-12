@@ -175,16 +175,21 @@
       }
       
       const screenWidth = window.innerWidth - sidePadding;
-      const screenHeight = window.innerHeight;
+      const screenHeight = window.innerHeight - 10; // Small margin top/bottom
       let flipbookWidth, flipbookHeight;
 
-      // Always double page spread
-      if (screenWidth / screenHeight > ratio * 2) {
-        flipbookHeight = screenHeight;
-        flipbookWidth = flipbookHeight * ratio * 2;
-      } else {
+      // Calculate for double page spread - use whichever dimension is limiting
+      const widthBasedHeight = screenWidth / (ratio * 2);
+      const heightBasedWidth = screenHeight * (ratio * 2);
+      
+      if (widthBasedHeight <= screenHeight) {
+        // Width is the limiting factor
         flipbookWidth = screenWidth;
-        flipbookHeight = flipbookWidth / (ratio * 2);
+        flipbookHeight = widthBasedHeight;
+      } else {
+        // Height is the limiting factor
+        flipbookHeight = screenHeight;
+        flipbookWidth = heightBasedWidth;
       }
 
       function updateProgress() {
