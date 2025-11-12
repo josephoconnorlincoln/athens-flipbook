@@ -30,19 +30,6 @@
       opacity: 0;
       animation: fadeIn 0.8s ease-in forwards;
     }
-    @media (max-width: 1024px) {
-      .container {
-        padding: 0 20px;
-      }
-    }
-    @media (max-width: 768px) {
-      .container {
-        padding: 0 5px;
-      }
-      body {
-        cursor: default;
-      }
-    }
     @keyframes fadeIn {to {opacity: 1;}}
     #flipbook {
       margin: 0 auto;
@@ -114,13 +101,22 @@
     .fullscreen-btn:hover {background: rgba(255,255,255,0.2);transform: scale(1.05);}
     .fullscreen-btn.visible {opacity: 1;}
     .fullscreen-btn .icon {font-size:18px;}
+
+    /* Responsive adjustments for phones and small tablets */
     @media (max-width: 768px) {
+      .container {padding: 0 10px;}
+      #flipbook {
+        width: 100% !important;
+        height: auto !important;
+      }
+      #flipbook .page img {object-fit: contain;}
       .fullscreen-btn {
-        padding: 10px 16px;
-        font-size: 12px;
         top: 10px;
         right: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
       }
+      .loading-bar {width: 200px;}
     }
   </style>
 </head>
@@ -143,7 +139,6 @@
   <script>
     const totalPages = 132;
     let hideControlsTimeout;
-    const IS_MOBILE_DEVICE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     function getPageFilename(pageNum) {
       return pageNum === 1 ? 'page__.jpg' : `page__${pageNum}.jpg`;
@@ -164,34 +159,21 @@
       let loadedCount = 0;
 
       const ratio = 22 / 17;
-      const isMobile = IS_MOBILE_DEVICE || window.innerWidth <= 768;
-      const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
-      
-      // Adjust padding based on device
-      let sidePadding = 80; // desktop default (40px each side)
-      
-      if (isMobile) {
-        sidePadding = 10; // mobile minimal padding
-      } else if (isTablet) {
-        sidePadding = 40; // tablet
-      }
-      
-      const screenWidth = window.innerWidth - sidePadding;
-      const screenHeight = window.innerHeight - 10;
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
       let flipbookWidth, flipbookHeight;
-      
-      console.log('Init - Width:', window.innerWidth, 'Height:', window.innerHeight, 'Mobile?', isMobile);
 
-      // Always double page spread
-      flipbookWidth = screenWidth;
-      flipbookHeight = screenWidth / (ratio * 2);
-      
-      if (flipbookHeight > screenHeight) {
+      // Responsive size calculation
+      if (screenWidth < 900) {
+        flipbookWidth = screenWidth - 20;
+        flipbookHeight = flipbookWidth / ratio;
+      } else if (screenWidth / screenHeight > ratio * 2) {
         flipbookHeight = screenHeight;
-        flipbookWidth = screenHeight * (ratio * 2);
+        flipbookWidth = flipbookHeight * ratio * 2;
+      } else {
+        flipbookWidth = screenWidth - 80;
+        flipbookHeight = flipbookWidth / (ratio * 2);
       }
-      
-      console.log('Double page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
 
       function updateProgress() {
         loadedCount++;
@@ -255,88 +237,6 @@
     });
 
     $(document).ready(() => {initFlipbook();handleMouseMove();});
-    
-    // Reinitialize on orientation change
-    let resizeTimeout;
-    let lastOrientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
-    
-    $(window).on('resize orientationchange', function() {
-      const currentOrientation = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
-      
-      // Only rebuild if orientation actually changed
-      if (currentOrientation !== lastOrientation) {
-        lastOrientation = currentOrientation;
-        
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function() {
-          const flipbook = $('#flipbook');
-          if (!flipbook.turn('is')) return;
-          
-          const currentPage = flipbook.turn('page');
-          
-          console.log('Orientation changed to:', currentOrientation);
-          
-          // Force a brief delay to let browser finish rotating
-          setTimeout(function() {
-            // Destroy Turn.js instance
-            flipbook.turn('destroy');
-            
-            // Clear all existing page elements
-            flipbook.empty();
-            
-            // Recalculate with new orientation - force fresh read
-            const ratio = 22 / 17;
-            const screenW = window.innerWidth;
-            const screenH = window.innerHeight;
-            const isMobile = IS_MOBILE_DEVICE || screenW <= 768;
-            const isTablet = screenW <= 1024 && screenW > 768;
-            const isPortrait = screenH > screenW;
-            
-            let sidePadding = 80;
-            if (isMobile) {
-              sidePadding = 10;
-            } else if (isTablet) {
-              sidePadding = 40;
-            }
-            
-            const screenWidth = screenW - sidePadding;
-            const screenHeight = screenH - 10;
-            let flipbookWidth, flipbookHeight;
-            
-            console.log('Resize - Width:', screenW, 'Height:', screenH, 'Mobile?', isMobile);
-
-            // Always double page spread
-            flipbookWidth = screenWidth;
-            flipbookHeight = screenWidth / (ratio * 2);
-            
-            if (flipbookHeight > screenHeight) {
-              flipbookHeight = screenHeight;
-              flipbookWidth = screenHeight * (ratio * 2);
-            }
-            
-            console.log('Double page mode - Width:', flipbookWidth, 'Height:', flipbookHeight);
-            
-            // Re-add all pages (from cache)
-            for (let i = 1; i <= totalPages; i++) {
-              const filename = getPageFilename(i);
-              flipbook.append(`<div class="page"><img src="${filename}" alt="Page ${i}"></div>`);
-            }
-            
-            // Reinitialize with new dimensions
-            flipbook.turn({
-              width: flipbookWidth,
-              height: flipbookHeight,
-              autoCenter: true,
-              acceleration: true,
-              gradients: true,
-              elevation: 50,
-              duration: 1200,
-              page: currentPage
-            });
-          }, 100); // Brief delay after orientation change
-        }, 300);
-      }
-    });
   </script>
 </body>
 </html>
